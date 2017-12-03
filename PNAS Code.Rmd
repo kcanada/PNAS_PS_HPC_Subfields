@@ -1,0 +1,267 @@
+---
+title: "MST Subfields Paper Analyses"
+author: "Kelsey Canada"
+date: "9/26/2017"
+output: pdf_document
+---
+```{r, echo=FALSE}
+library(knitr)
+library(visreg)
+library(ggplot2)
+library(extrafont)
+library(lm.beta)
+library(yhat)
+library(dplyr)
+loadfonts(quiet = T)
+fonts()
+opts_chunk$set(tidy.opts=list(width.cutoff=70),tidy=TRUE)
+
+apatheme=theme_bw()+
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        text=element_text(family='Times', size=24),
+        legend.title=element_blank(),
+        legend.position=c(.7,.8),
+        axis.line.x = element_line(color='black'),
+        axis.line.y = element_line(color='black'))
+```
+
+
+```{r, echo=FALSE}
+Subfields<-read.csv("~/Desktop/PNAS Data.csv", strip.white = TRUE)
+#change the above to the file path where it is saved OR manually input and make sure to import the file with the name "Subfields"
+
+#Center all variables
+Subfields$ExactAge<-Subfields$ExactAgeCalc
+Subfields$ExactAge_Centered<-Subfields$ExactAge-mean(Subfields$ExactAge)
+Subfields$ICV_Centered<-Subfields$ICV-mean(Subfields$ICV)
+Subfields$L_sub_head_ADJ_Centered<-Subfields$L_sub_head_ADJ-mean(Subfields$L_sub_head_ADJ)
+Subfields$L_CA1_head_ADJ_Centered<-Subfields$L_CA1_head_ADJ-mean(Subfields$L_CA1_head_ADJ)
+Subfields$L_DG_head_ADJ_Centered<-Subfields$L_DG_head_ADJ-mean(Subfields$L_DG_head_ADJ)
+Subfields$L_sub_body_ADJ_Centered<-Subfields$L_sub_body_ADJ-mean(Subfields$L_sub_body_ADJ)
+Subfields$L_CA1_body_ADJ_Centered<-Subfields$L_CA1_body_ADJ-mean(Subfields$L_CA1_body_ADJ)
+Subfields$L_DG_body_ADJ_Centered<-Subfields$L_DG_body_ADJ-mean(Subfields$L_DG_body_ADJ)
+Subfields$R_sub_head_ADJ_Centered<-Subfields$R_sub_head_ADJ-mean(Subfields$R_sub_head_ADJ)
+Subfields$R_CA1_head_ADJ_Centered<-Subfields$R_CA1_head_ADJ-mean(Subfields$R_CA1_head_ADJ)
+Subfields$R_DG_head_ADJ_Centered<-Subfields$R_DG_head_ADJ-mean(Subfields$R_DG_head_ADJ)
+Subfields$R_sub_body_ADJ_Centered<-Subfields$R_sub_body_ADJ-mean(Subfields$R_sub_body_ADJ)
+Subfields$R_CA1_body_ADJ_Centered<-Subfields$R_CA1_body_ADJ-mean(Subfields$R_CA1_body_ADJ)
+Subfields$R_DG_body_ADJ_Centered<-Subfields$R_DG_body_ADJ-mean(Subfields$R_DG_body_ADJ)
+Subfields$L_subiculum_ADJ_Centered<-Subfields$L_subiculum_ADJ-mean(Subfields$L_subiculum_ADJ)
+Subfields$L_CA1_ADJ_Centered<-Subfields$L_CA1_ADJ-mean(Subfields$L_CA1_ADJ)
+Subfields$L_DG_ADJ_Centered<-Subfields$L_DG_ADJ-mean(Subfields$L_DG_ADJ)
+Subfields$R_subiculum_ADJ_Centered<-Subfields$R_subiculum_ADJ-mean(Subfields$R_subiculum_ADJ)
+Subfields$R_CA1_ADJ_Centered<-Subfields$R_CA1_ADJ-mean(Subfields$R_CA1_ADJ)
+Subfields$R_DG_ADJ_Centered<-Subfields$R_DG_ADJ-mean(Subfields$R_DG_ADJ)
+Subfields$Sub_ADJ_Centered<-Subfields$sub_ADJ-mean(Subfields$sub_ADJ)
+Subfields$CA1_ADJ_Centered<-Subfields$CA1_ADJ-mean(Subfields$CA1_ADJ)
+Subfields$DG_ADJ_Centered<-Subfields$DG_ADJ-mean(Subfields$DG_ADJ)
+
+Subfields$subiculum_body_ADJ_Centered<-Subfields$subiculum_body_ADJ-mean(Subfields$subiculum_body_ADJ)
+Subfields$CA1_body_ADJ_Centered<-Subfields$CA1_body_ADJ-mean(Subfields$CA1_body_ADJ)
+Subfields$DG_body_ADJ_Centered<-Subfields$DG_body_ADJ-mean(Subfields$DG_body_ADJ)
+```
+
+```{r}
+#Behavioral Results
+summary(lm(OO_OS_Prop~ExactAge, data=Subfields))
+summary(lm(OO_OS_Prop~Sex, data=Subfields))
+summary(lm(OO_OS_Prop~DG_ADJ*ExactAge+Sex, data=Subfields))
+beha_model<-(lm(OO_OS_Prop~ExactAge+Sex, data=Subfields))
+summary(lm(scale(OO_OS_Prop) ~ scale(ExactAge) + scale(Sex), data=Subfields))
+
+ICV_Age<-lm(ICV ~ ExactAge, data=Subfields)
+ICV_Sex<-lm(ICV ~ Sex, data=Subfields)
+ICV_Age_and_sex<-lm(ICV ~ ExactAge +Sex, data=Subfields)
+
+summary(ICV_Age)
+summary(ICV_Sex)
+summary(ICV_Age_and_sex)
+#recognition memory
+OO_ON_Prop_Age<-summary(lm(DG_ADJ~Age_Squared+Sex, data=Subfields))
+
+#resp to target items
+OO_Prop_Age<-summary(lm(OO_Prop~YoungOldGroup, data=Subfields))
+SO_Prop_Age<-summary(lm(SO_Prop~YoungOldGroup, data=Subfields))
+NO_Prop_Age<-summary(lm(NO_Prop~YoungOldGroup, data=Subfields))
+
+#resp to lure
+OS_Prop_Age<-summary(lm(OS_Prop~YoungOldGroup, data=Subfields))
+SS_Prop_Age<-summary(lm(SS_Prop~YoungOldGroup, data=Subfields))
+NS_Prop_Age<-summary(lm(NS_Prop~YoungOldGroup, data=Subfields))
+
+#resp to foild
+ON_Prop_Age<-summary(lm(ON_Prop~YoungOldGroup, data=Subfields))
+SN_Prop_Age<-summary(lm(SN_Prop~YoungOldGroup, data=Subfields))
+NN_Prop_Age<-summary(lm(NN_Prop~YoungOldGroup, data=Subfields))
+
+Props_Only<-Subfields[,c("Subject_ID", "YoungOldGroup","OO_Prop","SO_Prop","NO_Prop","OS_Prop","SS_Prop","NS_Prop","ON_Prop","SN_Prop","NN_Prop", "OO_ON_Prop")]
+melted <- melt(Props_Only, id.vars=c("Subject_ID", "YoungOldGroup"))
+means <- ddply(melted, c("YoungOldGroup", "variable"), summarise, mean=mean(value))
+se <- function(x) sqrt(var(x)/length(x))
+ses_of_mean <- ddply(melted, c("YoungOldGroup", "variable"), summarise, se=se(value))
+sds_of_mean <- ddply(melted, c("YoungOldGroup", "variable"), summarise, sd=sd(value))
+
+
+means$StimulusType<-'NA'
+means$StimulusType[means$variable=="OO_Prop"]<-"Target"
+means$StimulusType[means$variable=="SO_Prop"]<-"Target"
+means$StimulusType[means$variable=="NO_Prop"]<-"Target"
+
+means$StimulusType[means$variable=="OS_Prop"]<-"Lure"
+means$StimulusType[means$variable=="SS_Prop"]<-"Lure"
+means$StimulusType[means$variable=="NS_Prop"]<-"Lure"
+
+means$StimulusType[means$variable=="ON_Prop"]<-"Foil"
+means$StimulusType[means$variable=="SN_Prop"]<-"Foil"
+means$StimulusType[means$variable=="NN_Prop"]<-"Foil"
+means$StimulusType<-as.factor(means$StimulusType)
+
+
+ggplot(means, aes(x=as.factor(variable), y=mean, fill=YoungOldGroup))+
+  geom_bar(position=position_dodge(), stat="identity", colour='black')
+
+lm_Full_Model_scaled<-lm(scale(OO_OS_Prop)~scale(ExactAge_Centered) + scale(Sex) + scale(DG_ADJ_Centered) + scale(CA1_ADJ_Centered) + scale(Sub_ADJ_Centered) + scale((ExactAge_Centered*DG_ADJ_Centered))+ scale((ExactAge_Centered*CA1_ADJ_Centered)) + scale((ExactAge_Centered*Sub_ADJ_Centered)), data=Subfields)
+summary(lm_Full_Model_scaled)
+
+```
+
+```{r, echo=FALSE}
+#Code for Behavioral Plots
+Subfields$Sex2<- ifelse(Subfields$Sex==1, 0,1)
+st.err <- function(x) {
+    sd(x)/sqrt(length(x))
+     }
+#A3050B #CC6666 (colors)
+
+Behavioral_plot<-ggplot(Subfields, aes(x =ExactAge, y = OO_OS_Prop)) + geom_point() +apatheme+ geom_smooth(method = "lm", se=FALSE, color="black") + labs( x = expression(paste("Age in Years")), y = "Bias-Corrected Lure Discrimination Index") +apatheme + theme(plot.title = element_text(hjust = 0)) + theme(axis.text=element_text(size=26, color='black'),axis.line=element_line(color='black'), axis.title=element_text(size=26),plot.title = element_text(size=26), strip.text.x = element_text(size = 26), legend.text=element_text(size=26), )+ theme(plot.title = element_text(hjust = 0.5))+theme(legend.position = "right")
+
+Behavioral_plot
+```
+
+
+```{r}
+##volumetric results
+Subs_Only<-Subfields[,c("Subject_ID", "YoungOldGroup","DG_ADJ","sub_ADJ","CA1_ADJ")]
+neuro <- melt(Subs_Only, id.vars=c("Subject_ID", "YoungOldGroup"))
+brain_means <- ddply(neuro, c("YoungOldGroup", "variable"), summarise, mean=mean(value))
+
+brain_se <- function(x) sqrt(var(x)/length(x))
+brain_ses_of_mean <- ddply(neuro, c("YoungOldGroup", "variable"), summarise, se=se(value))
+brain_sds_of_mean <- ddply(neuro, c("YoungOldGroup", "variable"), summarise, sd=sd(value))
+
+#linear plots
+DGvolumeplot<- ggplot(Subfields, aes(x=ExactAge, y=DG_ADJ)) + geom_smooth(method="lm", formula=y ~ x, size=1.5, data=Subfields) + geom_point()
+subvolumeplot<- ggplot(Subfields, aes(x=ExactAge, y=sub_ADJ)) + geom_smooth(method="lm", formula=y ~ x , size=1.5, data=Subfields) + geom_point()
+CA1volumeplot<- ggplot(Subfields, aes(x=ExactAge, y=CA1_ADJ)) + geom_smooth(method="lm", formula=y ~ x , size=1.5, data=Subfields) + geom_point()
+
+#squared plots
+DGSquaredplot<- ggplot(Subfields, aes(x=ExactAge, y=DG_ADJ)) + geom_smooth(method="lm", formula=y ~ x + I(x^2), size=1.5, data=Subfields, se=FALSE, color="#2B15EB") + geom_point(color="#2B15EB") +apatheme + theme(axis.text=element_text(size=24, color='black', family = "Times"),axis.line=element_line(color='black'), axis.title=element_text(size=24, family = "Times"))+labs(x = "Age (years)", y = expression(paste("Volume ", (mm^{3}))))+ scale_y_continuous(limits=c(800,2500))
+
+subSquaredplot <-ggplot(Subfields, aes(x=ExactAge, y=sub_ADJ)) + geom_smooth(method="lm", formula=y ~ x, size=1.5, data=Subfields,se=FALSE, color="#EB2B15") + geom_point(color="#EB2B15") + apatheme+ theme(axis.text=element_text(size=24, color='black', family = "Times"),axis.line=element_line(color='black'), axis.title=element_text(size=24, family = "Times"), axis.ticks.y = element_blank(), axis.text.y = element_blank(), axis.title.y = element_blank())+labs(x = "Age (years)", y = expression(paste("Sub ", mm^{3})))+ scale_y_continuous(limits=c(800,2500))
+
+CA1Squaredplot<- ggplot(Subfields, aes(x=ExactAge, y=CA1_ADJ)) + geom_smooth(method="lm", formula=y ~ x +I(x^2), size=1.5, data=Subfields, se=FALSE, color="#15EB2B") + geom_point(color="#15EB2B") +apatheme+ theme(axis.text=element_text(size=24, color='black', family = "Times"),axis.line=element_line(color='black'), axis.title.y=element_blank(),axis.text.y = element_blank(),axis.title=element_text(size=24, family = "Times"), axis.ticks.y = element_blank())+labs(x = "Age (years)", y = expression(paste("CA1 ", mm^{3})))+ scale_y_continuous(limits=c(800,2500))
+
+
+##regression models
+DG_Age<-lm(DG_ADJ~Subfields$ExactAge + Sex, data=Subfields)
+summary(DG_Age)
+DG_AgeSquared<-lm(DG_ADJ~Subfields$ExactAge+Subfields$Age_Squared +Subfields$Sex, data=Subfields)
+summary(DG_AgeSquared)
+
+
+CA1_Age<-lm(CA1_ADJ~Subfields$ExactAge, data=Subfields)
+summary(CA1_Age)
+CA1_AgeSquared<-lm(CA1_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(CA1_AgeSquared)
+sub_Age<-lm(sub_ADJ~Subfields$ExactAge, data=Subfields)
+summary(sub_Age)
+sub_AgeSquared<-lm(sub_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(sub_AgeSquared)
+
+DG_body_Age<-lm(DG_body_ADJ~Subfields$ExactAge, data=Subfields)
+summary(DG_body_Age)
+DG_body_AgeSquared<-lm(DG_body_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(DG_body_AgeSquared)
+CA1_body_Age<-lm(CA1_body_ADJ~Subfields$ExactAge, data=Subfields)
+summary(CA1_body_Age)
+CA1_body_AgeSquared<-lm(CA1_body_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(CA1_body_AgeSquared)
+sub_body_Age<-lm(subiculum_body_ADJ~Subfields$ExactAge, data=Subfields)
+summary(sub_body_Age)
+sub_body_AgeSquared<-lm(subiculum_body_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(sub_body_AgeSquared)
+
+DG_head_Age<-lm(DG_head_ADJ~Subfields$ExactAge, data=Subfields)
+summary(DG_head_Age)
+DG_head_AgeSquared<-lm(DG_head_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(DG_head_AgeSquared)
+CA1_head_Age<-lm(CA1_head_ADJ~Subfields$ExactAge, data=Subfields)
+summary(CA1_head_Age)
+CA1_head_AgeSquared<-lm(CA1_head_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(CA1_head_AgeSquared)
+sub_head_Age<-lm(subiculum_head_ADJ~Subfields$ExactAge, data=Subfields)
+summary(sub_head_Age)
+sub_head_AgeSquared<-lm(subiculum_head_ADJ~Subfields$ExactAge+Subfields$Age_Squared, data=Subfields)
+summary(sub_head_AgeSquared)
+
+#plots used in paper
+
+DGSquaredplot
+subSquaredplot
+CA1Squaredplot
+```
+
+```{r}
+#Models for Pattern Separation and Subfields
+Subfields$ExactAge_Centered<-Subfields$ExactAge-mean(Subfields$ExactAge)
+lm_MainEffect_Model<-lm(OO_OS_Prop~ExactAge_Centered + Sex + DG_ADJ_Centered + CA1_ADJ_Centered + Sub_ADJ_Centered, data=Subfields)
+summary(lm_MainEffect_Model)
+lm_Full_Model<-lm(OO_OS_Prop~ExactAge_Centered + Sex + DG_ADJ_Centered + CA1_ADJ_Centered + Sub_ADJ_Centered + (ExactAge_Centered*DG_ADJ_Centered)+ (ExactAge_Centered*CA1_ADJ_Centered)+ (ExactAge_Centered*Sub_ADJ_Centered), data=Subfields)
+summary(lm_Full_Model)
+lm_raw_Full_Model<-lm(OO_OS_Prop~ExactAge + Sex + DG_volume + CA1_volume + subiculum_volume + (ExactAge*DG_volume)+ (ExactAge*CA1_volume)+ (ExactAge*subiculum_volume), data=Subfields)
+summary(lm_raw_Full_Model)
+```
+
+```{r,echo=FALSE}
+#Code for Overall Subfields Interaction Plot
+#no labels centered
+PS_DG_ConditionalbyAge<-visreg(lm_Full_Model, "DG_ADJ_Centered", by="ExactAge_Centered", breaks=c(-1.30, 1.30), line.par = list(col = '#A3050B'), fill.par=list(fill="#F9D9D2"), gg=TRUE) + theme_bw(base_family ="Cambria") + geom_point() + labs(title= "Pattern Separation and DG/CA2-4 Volume", x = expression(paste("DG/CA2-4 Volume ", mm^{3})), y = "Bias-Corrected Lure Discrimination Index") +theme(panel.spacing = unit(.9, "lines"))+theme(axis.line = element_line(colour = "black"))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+ theme(panel.border = element_blank())+ theme(axis.text=element_text(size=12), axis.title=element_text(size=12,face="bold"),plot.title = element_text(size=18, face="bold"), strip.text.x = element_text(size = 12))+ theme(plot.title = element_text(hjust = 0.5))
+
+#no labels uncentered for paper
+lm_uncentered_Full_Model<-lm(OO_OS_Prop~ExactAge + Sex + DG_ADJ + CA1_ADJ + sub_ADJ + (ExactAge*DG_ADJ)+ (ExactAge*CA1_ADJ)+ (ExactAge*sub_ADJ), data=Subfields)
+
+PS_DG_ConditionalbyAge_ForPaper<-visreg(lm_uncentered_Full_Model, "DG_ADJ", by="ExactAge", breaks=c(5.34, 7.98), line.par = list(col = "#2B15EB"), band=FALSE, gg=TRUE,strip.names=FALSE) + apatheme + theme_bw(base_family ="Times") + geom_point(color="#2B15EB") + labs(x = expression(paste("Adjusted CA2-4/DG Volume ", (mm^{3}))), y = "Bias-Corrected Lure Discrimination Index") +theme(panel.spacing = unit(.9, "lines"))+ theme(axis.line = element_line(colour = "black"))+ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border = element_blank(), strip.background=element_blank(), strip.text.x = element_text(colour = "white" ))+ theme(axis.text=element_text(size=16, colour = "black"), axis.title=element_text(size=16, color = "black"),plot.title = element_text(size=16, face="bold"), strip.text.x = element_text(size = 16))+ theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r, echo=FALSE}
+#Split Age To illustrate interaction
+lm_AgeGroup_Full_Model<-lm(OO_OS_Prop~YoungOldGroup + Sex + DG_ADJ_Centered + CA1_ADJ_Centered + Sub_ADJ_Centered + (YoungOldGroup*DG_ADJ_Centered)+ (YoungOldGroup*CA1_ADJ_Centered)+ (YoungOldGroup*Sub_ADJ_Centered), data=Subfields)
+Subfields$YoungOldGroup<-as.factor(Subfields$YoungOldGroup)
+
+Subfields$YoungOldGroupNew<-as.factor(Subfields$YoungOldGroup)
+levels(Subfields$YoungOldGroupNew)[levels(Subfields$YoungOldGroupNew)==0] <- "Younger"
+levels(Subfields$YoungOldGroupNew)[levels(Subfields$YoungOldGroupNew)==1] <- "Older"
+
+APA_arbitrary_split_age_plot<-ggplot(Subfields, aes(x =DG_ADJ_Centered, y = OO_OS_Prop, linetype=YoungOldGroupNew, shape=YoungOldGroupNew, color=YoungOldGroupNew)) + geom_point() +scale_color_manual(values=c('black','black'))+ scale_shape_manual(values=c(1,16)) + geom_smooth(aes(group = YoungOldGroup, linetype=YoungOldGroupNew), method = "lm", se=FALSE) + scale_linetype_manual(values=c("solid", "twodash")) + labs(title= "Pattern Separation and DG/CA2-4 Volume", x = expression(paste("DG/CA2-4 Volume ", mm^{3})), y = "Bias-Corrected Lure Discrimination Index") +apatheme + theme(plot.title = element_text(hjust = 0)) + theme(axis.text=element_text(size=12, color='black'),axis.line=element_line(color='black'), axis.title=element_text(size=12),plot.title = element_text(size=16), strip.text.x = element_text(size = 12), legend.text=element_text(size=12), )+ theme(plot.title = element_text(hjust = 0.5))+ theme(text=element_text(family='Times', size=12))
+
+```
+
+```{r}
+#Interaction Plots used in paper
+PS_DG_ConditionalbyAge_ForPaper
+```
+
+```{r}
+#Supporting information code for item memory models
+
+Subfields$DG_x_AGE<-Subfields$ExactAge_Centered*Subfields$DG_ADJ_Centered
+Subfields$CA1_x_AGE<-Subfields$ExactAge_Centered*Subfields$CA1_ADJ_Centered
+Subfields$Sub_x_AGE<-Subfields$ExactAge_Centered*Subfields$Sub_ADJ_Centered
+
+full_model_item_scaled<-lm(scale(OO_ON_Prop)~scale(ExactAge_Centered) + scale(Sex) + scale(DG_ADJ_Centered) + scale(CA1_ADJ_Centered) + scale(Sub_ADJ_Centered)+ scale(DG_x_AGE)+scale(CA1_x_AGE)+scale(Sub_x_AGE), data=Subfields)
+
+ME_model_item_scaled<-tablelm.scaled<-lm(scale(OO_ON_Prop)~scale(ExactAge_Centered) + scale(Sex) + scale(DG_ADJ_Centered) + scale(CA1_ADJ_Centered) + scale(Sub_ADJ_Centered), data=Subfields)
+```
